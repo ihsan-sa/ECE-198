@@ -37,10 +37,10 @@ public:
 
 	int read();
 	int listen();
-	char *read_message();
-	int *read_data();
+	char *read_message(char *result);
+	int *read_data(int *result);
 	void send_data(int *data);
-	void send_message(char *message);
+	void send_message(char message[]);
 	void send_byte(int byte);
 
 }UART_Connection;
@@ -93,7 +93,7 @@ char *UART_Connection::read_message(char *result){
 		received = this->listen();
 		result[i] = (char)received;
 		i++;
-	}while(received != this->message_end_char_);
+	}while(received != (int)this->message_end_char_);
 	result[i-1] = '\0'; //set last char to the null char.
 
 	return result;
@@ -105,7 +105,7 @@ int *UART_Connection::read_data(int *result){
 		received = this->listen();
 		result[i] = received;
 		i++;
-	}while(received != this->message_end_char_);
+	}while(received != (int)this->message_end_char_);
 	result[i-1] = 0;
 	return result;
 }
@@ -121,7 +121,7 @@ void UART_Connection::send_byte(int byte){
 	//Send MSB first
 	int mask = 0b10000000;
 	for(int i{0}; i < 8; i++){
-		HAL_GPIO_WritePin(this->tx_port_, this->tx_pin_, (byte & mask == 1) ? GPIO_PIN_SET : GPIO_PIN_RESET );
+		HAL_GPIO_WritePin(this->tx_port_, this->tx_pin_, ((byte & mask) == 1) ? GPIO_PIN_SET : GPIO_PIN_RESET );
 		mask >>= 1;
 		HAL_Delay(time_period);
 
@@ -130,7 +130,7 @@ void UART_Connection::send_byte(int byte){
 	HAL_GPIO_WritePin(this->tx_port_, this->tx_pin_, GPIO_PIN_SET);
 }
 
-void UART_Connection::send_message(char *message){
+void UART_Connection::send_message(char message[]){
 
 	long double time_period = 1.0/this->baud_rate_;
 	int i{0};

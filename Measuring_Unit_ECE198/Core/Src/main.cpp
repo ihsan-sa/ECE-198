@@ -94,7 +94,8 @@ int main(void)
   /* USER CODE BEGIN 2 */
 
   UART_Connection uart1(UART_TX_Pin, GPIOA, UART_RX_Pin, GPIOB, 100, 0b11011110);
-  uart1.send_message("HELLO\0");
+  char message[10]{'H', 'e','l','l','o','\0'};
+  uart1.send_message(message);
 
   /* USER CODE END 2 */
 
