@@ -60,8 +60,8 @@ all: main-build
 main-build: MPU6050_Data_Collection.elf secondary-outputs
 
 # Tool invocations
-MPU6050_Data_Collection.elf MPU6050_Data_Collection.map: $(OBJS) $(USER_OBJS) C:\Users\dhyey\STM32CubeIDE\workspace_1.16.0\MPU6050_Data_Collection\STM32F401RETX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
-	arm-none-eabi-gcc -o "MPU6050_Data_Collection.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"C:\Users\dhyey\STM32CubeIDE\workspace_1.16.0\MPU6050_Data_Collection\STM32F401RETX_FLASH.ld" --specs=nosys.specs -Wl,-Map="MPU6050_Data_Collection.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+MPU6050_Data_Collection.elf MPU6050_Data_Collection.map: $(OBJS) $(USER_OBJS) C:\Users\dhyey\Documents\ECE-198\MPU6050_Data_Collection\STM32F401RETX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
+	arm-none-eabi-gcc -o "MPU6050_Data_Collection.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"C:\Users\dhyey\Documents\ECE-198\MPU6050_Data_Collection\STM32F401RETX_FLASH.ld" --specs=nosys.specs -Wl,-Map="MPU6050_Data_Collection.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
 	@echo 'Finished building target: $@'
 	@echo ' '
 

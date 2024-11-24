@@ -18,7 +18,7 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
-#include <stdio.h>
+
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 
@@ -65,154 +65,365 @@ int __io_putchar(int ch)
 
 
 void writeMPU(GPIO_TypeDef* gpioTypeSDA, int sdaPin, GPIO_TypeDef* gpioTypeSCL,
-			  int sclPin, int deviceAddress, int writeAddress, int message, int delayVal) {
+			  int sclPin, GPIO_TypeDef* gpioTypeRead, int readPin, int deviceAddress, int writeAddress,
+			  int message, int delayVal) {
 
-	printf("enter\r\n");
+	printf("writing to device\r\n");
+//	HAL_Delay(1000);
+//	printf("test hal delay\r\n");
 
-	HAL_GPIO_WritePin(gpioTypeSDA, sdaPin, GPIO_PIN_SET); // D7
-	HAL_GPIO_WritePin(gpioTypeSCL, sclPin, GPIO_PIN_SET); // D8
-	HAL_Delay(100);
+	// start condition:
+	HAL_GPIO_WritePin(gpioTypeSDA, sdaPin, 1);
+	HAL_GPIO_WritePin(gpioTypeSCL, sclPin, 1);
+	HAL_Delay(delayVal);
 
-	HAL_GPIO_WritePin(gpioTypeSDA, sdaPin, GPIO_PIN_RESET); // D7
-	HAL_GPIO_WritePin(gpioTypeSCL, sclPin, GPIO_PIN_RESET); // D8
-	HAL_Delay(100);
+	HAL_GPIO_WritePin(gpioTypeSDA, sdaPin, 0);
+	HAL_Delay(delayVal);
+	HAL_GPIO_WritePin(gpioTypeSCL, sclPin, 0);
+	HAL_Delay(delayVal);
 
-	HAL_GPIO_WritePin(gpioTypeSDA, sdaPin, GPIO_PIN_SET); // D7
-	HAL_GPIO_WritePin(gpioTypeSCL, sclPin, GPIO_PIN_SET); // D8
-	HAL_Delay(100);
 
-	// wake up the mpu
-	 HAL_GPIO_WritePin(gpioTypeSDA, sdaPin, GPIO_PIN_SET);
-	 HAL_GPIO_WritePin(gpioTypeSCL, sclPin, GPIO_PIN_SET);
-
-	 // make default state of the pin after pinMode is called to be HIGH
-	 if (sdaPin == GPIO_PIN_8){GPIOA->MODER |= GPIO_MODER_MODER8_0;} // input to output
-	 if (sclPin == GPIO_PIN_9){GPIOA->MODER |= GPIO_MODER_MODER9_0;} // input to output
-
-	 HAL_Delay(delayVal);
-
-	 // start condition:
-	 HAL_GPIO_WritePin(gpioTypeSDA, sdaPin, GPIO_PIN_RESET);
-	 HAL_Delay(delayVal);
-	 HAL_GPIO_WritePin(gpioTypeSCL, sclPin, GPIO_PIN_RESET);
-	 HAL_Delay(delayVal);
-
-	  // send device address
-	  for (int i=0; i<7; i++){
-	    HAL_GPIO_WritePin(gpioTypeSDA, sdaPin, !!(deviceAddress & (1 << 6-i)) );
+	// send device address
+	for (int i=0; i<7; i++){
+		HAL_GPIO_WritePin(gpioTypeSDA, sdaPin, !!(deviceAddress & (1 << 6-i)) );
 	    HAL_Delay(delayVal);
-	    HAL_GPIO_WritePin(gpioTypeSCL, sclPin, GPIO_PIN_SET);
+
+//	    if (HAL_GPIO_ReadPin(gpioTypeRead, readPin)){
+//	    	printf("1\r\n");
+//	    }
+//	    else{
+//	    	printf("0\r\n");
+//	    }
+
+	    HAL_GPIO_WritePin(gpioTypeSCL, sclPin, 1);
 	    HAL_Delay(delayVal);
-	    HAL_GPIO_WritePin(gpioTypeSCL, sclPin, GPIO_PIN_RESET);
+	    HAL_GPIO_WritePin(gpioTypeSCL, sclPin, 0);
 	    HAL_Delay(delayVal);
-	    HAL_GPIO_WritePin(gpioTypeSDA, sdaPin, GPIO_PIN_RESET);
+
+	    HAL_GPIO_WritePin(gpioTypeSDA, sdaPin, 0);
 	    HAL_Delay(delayVal);
-	  }
-
-	  // write is logic low
-	  HAL_GPIO_WritePin(gpioTypeSDA, sdaPin, GPIO_PIN_RESET);
-	  HAL_Delay(delayVal);
-	  HAL_GPIO_WritePin(gpioTypeSCL, sclPin, GPIO_PIN_SET);
-	  HAL_Delay(delayVal);
-	  HAL_GPIO_WritePin(gpioTypeSCL, sclPin, GPIO_PIN_RESET);
-	  HAL_Delay(delayVal);
-	  HAL_GPIO_WritePin(gpioTypeSDA, sdaPin, GPIO_PIN_RESET);
-	  HAL_Delay(delayVal);
+	}
 
 
-	  HAL_GPIO_WritePin(gpioTypeSDA, sdaPin, GPIO_PIN_SET);
-	  // read acknowledge bit
-	  if (sdaPin == GPIO_PIN_8){GPIOA->MODER &= ~(GPIO_MODER_MODER8);} // change to reading the data line
-	  HAL_Delay(delayVal);
-	  HAL_GPIO_WritePin(gpioTypeSCL, sclPin, GPIO_PIN_SET);
-	  HAL_Delay(delayVal);
+	// write is logic low
+	HAL_GPIO_WritePin(gpioTypeSDA, sdaPin, 0);
+	HAL_Delay(delayVal);
 
-	  if (!HAL_GPIO_ReadPin(gpioTypeSDA, sdaPin)){
-		  printf("device recieved\r\n");
-	  }
+	HAL_GPIO_WritePin(gpioTypeSCL, sclPin, 1);
+	HAL_Delay(delayVal);
 
-	  HAL_Delay(delayVal);
-	  HAL_GPIO_WritePin(gpioTypeSCL, sclPin, GPIO_PIN_RESET);
-	  HAL_Delay(delayVal);
+//	if (HAL_GPIO_ReadPin(gpioTypeRead, readPin)){
+//		    	printf("1\r\n");
+//		    }
+//		    else{
+//		    	printf("0\r\n");
+//		    }
 
-	  HAL_GPIO_WritePin(gpioTypeSDA, sdaPin, GPIO_PIN_RESET);
-	  if (sdaPin == GPIO_PIN_8){GPIOA->MODER |= GPIO_MODER_MODER8_0;}
-	  HAL_Delay(delayVal);
+	HAL_GPIO_WritePin(gpioTypeSCL, sclPin, 0);
+	HAL_Delay(delayVal);
+
+	HAL_GPIO_WritePin(gpioTypeSDA, sdaPin, 0);
+	HAL_Delay(delayVal);
 
 
-	  // send internal power register address
-	  for (int i=0; i<8; i++){
-	    HAL_GPIO_WritePin(gpioTypeSDA, sdaPin, !!(writeAddress & (1 << 7-i)) );
-	    //printf(!!(powerRegister & (1 << 7-i)) );
+	// read acknowledge bit
+	HAL_GPIO_WritePin(gpioTypeSDA, sdaPin, 1);  // set SDA line to default high state
+	HAL_Delay(delayVal);
+
+	HAL_GPIO_WritePin(gpioTypeSCL, sclPin, 1);
+	HAL_Delay(delayVal);
+
+//	if (HAL_GPIO_ReadPin(gpioTypeRead, readPin)){
+//		    	printf("1\r\n");
+//		    }
+//		    else{
+//		    	printf("0\r\n");
+//		    }
+
+	if (!HAL_GPIO_ReadPin(gpioTypeRead, readPin)){
+		printf("device address received\r\n");
+	}
+	HAL_Delay(delayVal);
+
+	HAL_GPIO_WritePin(gpioTypeSCL, sclPin, 0);
+	HAL_Delay(delayVal);
+
+	HAL_GPIO_WritePin(gpioTypeSDA, sdaPin, 0); // reset SDA line to low after the device lets go of the SDA line
+	HAL_Delay(delayVal);
+
+
+	// send internal register address
+	for (int i=0; i<8; i++){
+		HAL_GPIO_WritePin(gpioTypeSDA, sdaPin, !!(writeAddress & (1 << 7-i)) );
 	    HAL_Delay(delayVal);
-	    HAL_GPIO_WritePin(gpioTypeSCL, sclPin, GPIO_PIN_SET);
+
+	    HAL_GPIO_WritePin(gpioTypeSCL, sclPin, 1);
 	    HAL_Delay(delayVal);
-	    HAL_GPIO_WritePin(gpioTypeSCL, sclPin, GPIO_PIN_RESET);
+	    HAL_GPIO_WritePin(gpioTypeSCL, sclPin, 0);
 	    HAL_Delay(delayVal);
-	    HAL_GPIO_WritePin(gpioTypeSDA, sdaPin, GPIO_PIN_RESET);
+
+	    HAL_GPIO_WritePin(gpioTypeSDA, sdaPin, 0);
 	    HAL_Delay(delayVal);
-	  }
+	}
 
 
+	// read acknowledge bit
+	HAL_GPIO_WritePin(gpioTypeSDA, sdaPin, 1);  // set SDA line to default high state
+	HAL_Delay(delayVal);
 
-	  HAL_GPIO_WritePin(gpioTypeSDA, sdaPin, GPIO_PIN_SET);
-	  // read acknowledge bit
-	  if (sdaPin == GPIO_PIN_8){GPIOA->MODER &= ~(GPIO_MODER_MODER8);} // change to reading the data line
-	  HAL_Delay(delayVal);
-	  HAL_GPIO_WritePin(gpioTypeSCL, sclPin, GPIO_PIN_SET);
-	  HAL_Delay(delayVal);
+	HAL_GPIO_WritePin(gpioTypeSCL, sclPin, 1);
+	HAL_Delay(delayVal);
 
-	  if (!HAL_GPIO_ReadPin(gpioTypeSDA, sdaPin)){
-	    printf("power register recieved\r\n");
-	  }
+	if (!HAL_GPIO_ReadPin(gpioTypeRead, readPin)){
+		printf("register address received\r\n");
+	}
+	HAL_Delay(delayVal);
 
-	  HAL_Delay(delayVal);
-	  HAL_GPIO_WritePin(gpioTypeSCL, sclPin, GPIO_PIN_RESET);
-	  HAL_Delay(delayVal);
+	HAL_GPIO_WritePin(gpioTypeSCL, sclPin, 0);
+	HAL_Delay(delayVal);
 
-	  HAL_GPIO_WritePin(gpioTypeSDA, sdaPin, GPIO_PIN_RESET);
-	  if (sdaPin == GPIO_PIN_8){GPIOA->MODER |= GPIO_MODER_MODER8_0;}
-	  HAL_Delay(delayVal);
+	HAL_GPIO_WritePin(gpioTypeSDA, sdaPin, 0); // reset SDA line to low after the device lets go of the SDA line
+	HAL_Delay(delayVal);
 
-	  // make to always awake
-	  for (int i=0; i<8; i++){
-	    HAL_GPIO_WritePin(gpioTypeSDA, sdaPin, !!(message & (1 << 7-i)) );
+
+	// send data to register, for power register of MPU, 0 means it keeps it always awake
+	for (int i=0; i<8; i++){
+		HAL_GPIO_WritePin(gpioTypeSDA, sdaPin, !!(message & (1 << 7-i)) );
 	    HAL_Delay(delayVal);
-	    HAL_GPIO_WritePin(gpioTypeSCL, sclPin, GPIO_PIN_SET);
+
+	    HAL_GPIO_WritePin(gpioTypeSCL, sclPin, 1);
 	    HAL_Delay(delayVal);
-	    HAL_GPIO_WritePin(gpioTypeSCL, sclPin, GPIO_PIN_RESET);
+	    HAL_GPIO_WritePin(gpioTypeSCL, sclPin, 0);
 	    HAL_Delay(delayVal);
-	    HAL_GPIO_WritePin(gpioTypeSDA, sdaPin, GPIO_PIN_RESET);
+
+	    HAL_GPIO_WritePin(gpioTypeSDA, sdaPin, 0);
 	    HAL_Delay(delayVal);
-	  }
+	}
 
 
-	  HAL_GPIO_WritePin(gpioTypeSDA, sdaPin, GPIO_PIN_SET);
-	  // read acknowledge bit
-	  if (sdaPin == GPIO_PIN_8){GPIOA->MODER &= ~(GPIO_MODER_MODER8);} // change to reading the data line
-	  HAL_Delay(delayVal);
-	  HAL_GPIO_WritePin(gpioTypeSCL, sclPin, GPIO_PIN_SET);
-	  HAL_Delay(delayVal);
+	// read acknowledge bit
+	HAL_GPIO_WritePin(gpioTypeSDA, sdaPin, 1);  // set SDA line to default high state
+	HAL_Delay(delayVal);
 
-	  if (!HAL_GPIO_ReadPin(gpioTypeSDA, sdaPin)){
-	    printf("device recieved\r\n");
-	  }
+	HAL_GPIO_WritePin(gpioTypeSCL, sclPin, 1);
+	HAL_Delay(delayVal);
 
-	  HAL_Delay(delayVal);
-	  HAL_GPIO_WritePin(gpioTypeSCL, sclPin, GPIO_PIN_RESET);
-	  HAL_Delay(delayVal);
+	if (!HAL_GPIO_ReadPin(gpioTypeRead, readPin)){
+		printf("message received\r\n");
+	}
+	HAL_Delay(delayVal);
 
-	  HAL_GPIO_WritePin(gpioTypeSDA, sdaPin, GPIO_PIN_RESET);
-	  if (sdaPin == GPIO_PIN_8){GPIOA->MODER |= GPIO_MODER_MODER8_0;}
-	  HAL_Delay(delayVal);
+	HAL_GPIO_WritePin(gpioTypeSCL, sclPin, 0);
+	HAL_Delay(delayVal);
 
+	HAL_GPIO_WritePin(gpioTypeSDA, sdaPin, 0); // reset SDA line to low after the device lets go of the SDA line
+	HAL_Delay(delayVal);
 
 
-	  // stop condition
-	  HAL_GPIO_WritePin(gpioTypeSCL, sclPin, GPIO_PIN_SET);
-	  HAL_Delay(delayVal);
-	  HAL_GPIO_WritePin(gpioTypeSDA, sdaPin, GPIO_PIN_SET);
-	  HAL_Delay(delayVal);
+
+	// stop condition
+	HAL_GPIO_WritePin(gpioTypeSCL, sclPin, 1);
+	HAL_Delay(delayVal);
+	HAL_GPIO_WritePin(gpioTypeSDA, sdaPin, 1);
+	HAL_Delay(delayVal);
+}
+
+
+int readMPU(GPIO_TypeDef* gpioTypeSDA, int sdaPin, GPIO_TypeDef* gpioTypeSCL, int sclPin,
+			GPIO_TypeDef* gpioTypeRead, int readPin, int deviceAddress, int readAddress, int delayVal) {
+
+	printf("reading from device\r\n");
+
+	int storeData = 0;
+	// start condition:
+	HAL_GPIO_WritePin(gpioTypeSDA, sdaPin, 1);
+	HAL_GPIO_WritePin(gpioTypeSCL, sclPin, 1);
+	HAL_Delay(delayVal);
+
+	HAL_GPIO_WritePin(gpioTypeSDA, sdaPin, 0);
+	HAL_Delay(delayVal);
+	HAL_GPIO_WritePin(gpioTypeSCL, sclPin, 0);
+	HAL_Delay(delayVal);
+
+
+	// send device address
+	for (int i=0; i<7; i++){
+		HAL_GPIO_WritePin(gpioTypeSDA, sdaPin, !!(deviceAddress & (1 << 6-i)) );
+		HAL_Delay(delayVal);
+
+		HAL_GPIO_WritePin(gpioTypeSCL, sclPin, 1);
+		HAL_Delay(delayVal);
+		HAL_GPIO_WritePin(gpioTypeSCL, sclPin, 0);
+		HAL_Delay(delayVal);
+
+		HAL_GPIO_WritePin(gpioTypeSDA, sdaPin, 0);
+		HAL_Delay(delayVal);
+	}
+
+
+	// write is logic low
+	HAL_GPIO_WritePin(gpioTypeSDA, sdaPin, 0);
+	HAL_Delay(delayVal);
+
+	HAL_GPIO_WritePin(gpioTypeSCL, sclPin, 1);
+	HAL_Delay(delayVal);
+	HAL_GPIO_WritePin(gpioTypeSCL, sclPin, 0);
+	HAL_Delay(delayVal);
+
+	HAL_GPIO_WritePin(gpioTypeSDA, sdaPin, 0);
+	HAL_Delay(delayVal);
+
+
+	// read acknowledge bit
+	HAL_GPIO_WritePin(gpioTypeSDA, sdaPin, 1);  // set SDA line to default high state
+	HAL_Delay(delayVal);
+
+	HAL_GPIO_WritePin(gpioTypeSCL, sclPin, 1);
+	HAL_Delay(delayVal);
+
+	if (!HAL_GPIO_ReadPin(gpioTypeRead, readPin)){
+		printf("device address received\r\n");
+	}
+	HAL_Delay(delayVal);
+
+	HAL_GPIO_WritePin(gpioTypeSCL, sclPin, 0);
+	HAL_Delay(delayVal);
+
+	HAL_GPIO_WritePin(gpioTypeSDA, sdaPin, 0); // reset SDA line to low after the device lets go of the SDA line
+	HAL_Delay(delayVal);
+
+
+
+	// send internal register address
+	for (int i=0; i<8; i++){
+		HAL_GPIO_WritePin(gpioTypeSDA, sdaPin, !!(readAddress & (1 << 7-i)) );
+	    HAL_Delay(delayVal);
+
+	    HAL_GPIO_WritePin(gpioTypeSCL, sclPin, 1);
+	    HAL_Delay(delayVal);
+	    HAL_GPIO_WritePin(gpioTypeSCL, sclPin, 0);
+	    HAL_Delay(delayVal);
+
+	    HAL_GPIO_WritePin(gpioTypeSDA, sdaPin, 0);
+	    HAL_Delay(delayVal);
+	}
+
+
+	// read acknowledge bit
+	HAL_GPIO_WritePin(gpioTypeSDA, sdaPin, 1);  // set SDA line to default high state
+	HAL_Delay(delayVal);
+
+	HAL_GPIO_WritePin(gpioTypeSCL, sclPin, 1);
+	HAL_Delay(delayVal);
+
+	if (!HAL_GPIO_ReadPin(gpioTypeRead, readPin)){
+		printf("register address received\r\n");
+	}
+	HAL_Delay(delayVal);
+
+	HAL_GPIO_WritePin(gpioTypeSCL, sclPin, 0);
+	HAL_Delay(delayVal);
+
+	HAL_GPIO_WritePin(gpioTypeSDA, sdaPin, 0); // reset SDA line to low after the device lets go of the SDA line
+	HAL_Delay(delayVal);
+
+
+
+	// start condition again
+	HAL_GPIO_WritePin(gpioTypeSDA, sdaPin, 1);
+	HAL_GPIO_WritePin(gpioTypeSCL, sclPin, 1);
+	HAL_Delay(delayVal);
+
+	HAL_GPIO_WritePin(gpioTypeSDA, sdaPin, 0);
+	HAL_Delay(delayVal);
+	HAL_GPIO_WritePin(gpioTypeSCL, sclPin, 0);
+	HAL_Delay(delayVal);
+
+
+	// send device address
+	for (int i=0; i<7; i++){
+		HAL_GPIO_WritePin(gpioTypeSDA, sdaPin, !!(deviceAddress & (1 << 6-i)) );
+		HAL_Delay(delayVal);
+
+		HAL_GPIO_WritePin(gpioTypeSCL, sclPin, 1);
+		HAL_Delay(delayVal);
+		HAL_GPIO_WritePin(gpioTypeSCL, sclPin, 0);
+		HAL_Delay(delayVal);
+
+		HAL_GPIO_WritePin(gpioTypeSDA, sdaPin, 0);
+		HAL_Delay(delayVal);
+	}
+
+
+	// read is logic high
+	HAL_GPIO_WritePin(gpioTypeSDA, sdaPin, 1);
+	HAL_Delay(delayVal);
+
+	HAL_GPIO_WritePin(gpioTypeSCL, sclPin, 1);
+	HAL_Delay(delayVal);
+	HAL_GPIO_WritePin(gpioTypeSCL, sclPin, 0);
+	HAL_Delay(delayVal);
+
+	HAL_GPIO_WritePin(gpioTypeSDA, sdaPin, 0);
+	HAL_Delay(delayVal);
+
+
+	// read acknowledge bit
+	HAL_GPIO_WritePin(gpioTypeSDA, sdaPin, 1);  // set SDA line to default high state
+	HAL_Delay(delayVal);
+
+	HAL_GPIO_WritePin(gpioTypeSCL, sclPin, 1);
+	HAL_Delay(delayVal);
+
+	if (!HAL_GPIO_ReadPin(gpioTypeRead, readPin)){
+		printf("register address to READ received\r\n");
+	}
+	HAL_Delay(delayVal);
+
+	HAL_GPIO_WritePin(gpioTypeSCL, sclPin, 0);
+	HAL_Delay(delayVal);
+
+
+	// keep SDA line default high before device pulls line and input stream of bits comes in
+	HAL_GPIO_WritePin(gpioTypeSDA, sdaPin, 1);
+	HAL_Delay(delayVal);
+
+
+	// Receive register data
+	for (int i=0; i<8; i++){
+		HAL_GPIO_WritePin(gpioTypeSCL, sclPin, 1);
+	    HAL_Delay(delayVal);
+
+	    storeData |= (HAL_GPIO_ReadPin(gpioTypeRead, readPin)) * (1 << 7-i); // add bit to acclZ
+	    HAL_Delay(delayVal);
+
+	    HAL_GPIO_WritePin(gpioTypeSCL, sclPin, 0); // now after this clock pulse, the sda line should change to corresponding value
+	    HAL_Delay(delayVal); // pause it a bit longer at 0 just in case
+	}
+
+
+	// send nack signal
+	HAL_GPIO_WritePin(gpioTypeSDA, sdaPin, 1);
+	HAL_Delay(delayVal);
+
+	HAL_GPIO_WritePin(gpioTypeSCL, sclPin, 1);
+	HAL_Delay(delayVal);
+	HAL_GPIO_WritePin(gpioTypeSCL, sclPin, 0);
+	HAL_Delay(delayVal);
+	printf("sent NACK signal\r\n");
+
+	HAL_GPIO_WritePin(gpioTypeSDA, sdaPin, 0);
+	HAL_Delay(delayVal);
+
+
+	//stop condition
+	HAL_GPIO_WritePin(gpioTypeSCL, sclPin, 1);
+	HAL_Delay(delayVal);
+	HAL_GPIO_WritePin(gpioTypeSCL, sdaPin, 1);
+	HAL_Delay(delayVal);
+
+
+	return storeData;
 }
 
 
@@ -251,19 +462,26 @@ int main(void)
   /* USER CODE BEGIN 2 */
 
   int mpuDeviceAddress = 0x68; // first 7 bits of i2c data
-    //  int acclZAxisRegisterBits15_8 = 0x3F; // 0x3f, 0x40
-    //  int acclZAxisRegisterBits7_0 = 0x40;
-      int powerRegister = 0x6B;
+  int acclZAxisRegisterBits15_8 = 0x3F; // 0x3f, 0x40
+  int acclZAxisRegisterBits7_0 = 0x40;
+  int powerRegister = 0x6B;
 
-      #define gpioTypeSDA GPIOA
-      // int sdaPin = GPIO_PIN_8;
 
-      #define gpioTypeSCL GPIOA
-       int sclPin = GPIO_PIN_9;
+  int sda = GPIO_PIN_8; // D7 --> PA_8
+  #define sdaType GPIOA
 
-       int delayVal = 2;
+  int scl = GPIO_PIN_9; //D8 --> PA_9
+  #define sclType GPIOA
 
-      int acclZ = 0;
+  int read = GPIO_PIN_5; //D4 --> PB_5
+  #define readType GPIOB
+
+  int delayTime = 1; // 1 ms
+
+  int16_t acclZ = 0;
+  float acclMS2 = 0;
+  // wake up MPU
+  writeMPU(sdaType, sda, sclType, scl, readType, read, mpuDeviceAddress, powerRegister, 0, delayTime);
 
 
   /* USER CODE END 2 */
@@ -272,15 +490,29 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-    /* USER CODE END WHILE */
-	  printf("done\r\n");
+	acclZ = 0;
+	acclZ |= ((readMPU(sdaType, sda, sclType, scl, readType, read, mpuDeviceAddress, acclZAxisRegisterBits15_8, delayTime)) << 8);
+	acclZ |= readMPU(sdaType, sda, sclType, scl, readType, read, mpuDeviceAddress, acclZAxisRegisterBits7_0, delayTime);
+	acclMS2 = (float)(acclZ) / 16000.0 * 9.8;
 
-      HAL_Delay(100);
-	  writeMPU(GPIOA, GPIO_PIN_8, GPIOA, GPIO_PIN_9, mpuDeviceAddress, powerRegister, 0, 5);
-	  printf("done\r\n");
-//	  printf("hi");
+	printf("\n");
+	printf("%d\r\n", acclZ);
+
+	printf("\n");
+	printf("%d", (int) acclMS2);
+	printf(".");
+	printf("%d\r\n", ( (int)(acclMS2 * 10.0) ) % 10);
+
+	printf("\n");
+    /* USER CODE END WHILE */
+
     /* USER CODE BEGIN 3 */
   }
+
+//	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_9, 1);
+//	HAL_Delay(4000);
+//	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_9, 0);
+//	HAL_Delay(1000);
   /* USER CODE END 3 */
 }
 
@@ -290,44 +522,44 @@ int main(void)
   */
 void SystemClock_Config(void)
 {
-	RCC_OscInitTypeDef RCC_OscInitStruct = {0};
-	  RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
+  RCC_OscInitTypeDef RCC_OscInitStruct = {0};
+  RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
 
-	  /** Configure the main internal regulator output voltage
-	  */
-	  __HAL_RCC_PWR_CLK_ENABLE();
-	  __HAL_PWR_VOLTAGESCALING_CONFIG(PWR_REGULATOR_VOLTAGE_SCALE2);
+  /** Configure the main internal regulator output voltage
+  */
+  __HAL_RCC_PWR_CLK_ENABLE();
+  __HAL_PWR_VOLTAGESCALING_CONFIG(PWR_REGULATOR_VOLTAGE_SCALE2);
 
-	  /** Initializes the RCC Oscillators according to the specified parameters
-	  * in the RCC_OscInitTypeDef structure.
-	  */
-	  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI;
-	  RCC_OscInitStruct.HSIState = RCC_HSI_ON;
-	  RCC_OscInitStruct.HSICalibrationValue = RCC_HSICALIBRATION_DEFAULT;
-	  RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
-	  RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSI;
-	  RCC_OscInitStruct.PLL.PLLM = 16;
-	  RCC_OscInitStruct.PLL.PLLN = 336;
-	  RCC_OscInitStruct.PLL.PLLP = RCC_PLLP_DIV4;
-	  RCC_OscInitStruct.PLL.PLLQ = 7;
-	  if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
-	  {
-	    Error_Handler();
-	  }
+  /** Initializes the RCC Oscillators according to the specified parameters
+  * in the RCC_OscInitTypeDef structure.
+  */
+  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI;
+  RCC_OscInitStruct.HSIState = RCC_HSI_ON;
+  RCC_OscInitStruct.HSICalibrationValue = RCC_HSICALIBRATION_DEFAULT;
+  RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
+  RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSI;
+  RCC_OscInitStruct.PLL.PLLM = 16;
+  RCC_OscInitStruct.PLL.PLLN = 336;
+  RCC_OscInitStruct.PLL.PLLP = RCC_PLLP_DIV4;
+  RCC_OscInitStruct.PLL.PLLQ = 7;
+  if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
+  {
+    Error_Handler();
+  }
 
-	  /** Initializes the CPU, AHB and APB buses clocks
-	  */
-	  RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK|RCC_CLOCKTYPE_SYSCLK
-	                              |RCC_CLOCKTYPE_PCLK1|RCC_CLOCKTYPE_PCLK2;
-	  RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
-	  RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
-	  RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV2;
-	  RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;
+  /** Initializes the CPU, AHB and APB buses clocks
+  */
+  RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK|RCC_CLOCKTYPE_SYSCLK
+                              |RCC_CLOCKTYPE_PCLK1|RCC_CLOCKTYPE_PCLK2;
+  RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
+  RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
+  RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV2;
+  RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;
 
-	  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_2) != HAL_OK)
-	  {
-	    Error_Handler();
-	  }
+  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_2) != HAL_OK)
+  {
+    Error_Handler();
+  }
 }
 
 /**
@@ -389,12 +621,25 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(B1_GPIO_Port, &GPIO_InitStruct);
 
-  /*Configure GPIO pins : LD2_Pin PA8 PA9 */
-  GPIO_InitStruct.Pin = LD2_Pin|GPIO_PIN_8|GPIO_PIN_9;
+  /*Configure GPIO pins : LD2_Pin PA9 */
+  GPIO_InitStruct.Pin = LD2_Pin|GPIO_PIN_9;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+
+  /*Configure GPIO pin : PA8 */
+  GPIO_InitStruct.Pin = GPIO_PIN_8;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_OD;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+
+  /*Configure GPIO pin : PB5 */
+  GPIO_InitStruct.Pin = GPIO_PIN_5;
+  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
 /* USER CODE BEGIN MX_GPIO_Init_2 */
 /* USER CODE END MX_GPIO_Init_2 */
