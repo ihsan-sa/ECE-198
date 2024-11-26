@@ -34,34 +34,34 @@ $(wildcard ../makefile.init) \
 $(wildcard ../makefile.targets) \
 
 
-BUILD_ARTIFACT_NAME := UART_Communication
+BUILD_ARTIFACT_NAME := UART_Transmitter
 BUILD_ARTIFACT_EXTENSION := elf
 BUILD_ARTIFACT_PREFIX :=
 BUILD_ARTIFACT := $(BUILD_ARTIFACT_PREFIX)$(BUILD_ARTIFACT_NAME)$(if $(BUILD_ARTIFACT_EXTENSION),.$(BUILD_ARTIFACT_EXTENSION),)
 
 # Add inputs and outputs from these tool invocations to the build variables 
 EXECUTABLES += \
-UART_Communication.elf \
+UART_Transmitter.elf \
 
 MAP_FILES += \
-UART_Communication.map \
+UART_Transmitter.map \
 
 SIZE_OUTPUT += \
 default.size.stdout \
 
 OBJDUMP_LIST += \
-UART_Communication.list \
+UART_Transmitter.list \
 
 
 # All Target
 all: main-build
 
 # Main-build Target
-main-build: UART_Communication.elf secondary-outputs
+main-build: UART_Transmitter.elf secondary-outputs
 
 # Tool invocations
-UART_Communication.elf UART_Communication.map: $(OBJS) $(USER_OBJS) C:\Users\dhyey\STM32CubeIDE\workspace_1.16.0\UART_Communication\STM32F401RETX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
-	arm-none-eabi-gcc -o "UART_Communication.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"C:\Users\dhyey\STM32CubeIDE\workspace_1.16.0\UART_Communication\STM32F401RETX_FLASH.ld" --specs=nosys.specs -Wl,-Map="UART_Communication.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+UART_Transmitter.elf UART_Transmitter.map: $(OBJS) $(USER_OBJS) C:\Users\dhyey\Documents\ECE-198\UART_Communication\STM32F401RETX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
+	arm-none-eabi-gcc -o "UART_Transmitter.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"C:\Users\dhyey\Documents\ECE-198\UART_Communication\STM32F401RETX_FLASH.ld" --specs=nosys.specs -Wl,-Map="UART_Transmitter.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
 	@echo 'Finished building target: $@'
 	@echo ' '
 
@@ -70,14 +70,14 @@ default.size.stdout: $(EXECUTABLES) makefile objects.list $(OPTIONAL_TOOL_DEPS)
 	@echo 'Finished building: $@'
 	@echo ' '
 
-UART_Communication.list: $(EXECUTABLES) makefile objects.list $(OPTIONAL_TOOL_DEPS)
-	arm-none-eabi-objdump -h -S $(EXECUTABLES) > "UART_Communication.list"
+UART_Transmitter.list: $(EXECUTABLES) makefile objects.list $(OPTIONAL_TOOL_DEPS)
+	arm-none-eabi-objdump -h -S $(EXECUTABLES) > "UART_Transmitter.list"
 	@echo 'Finished building: $@'
 	@echo ' '
 
 # Other Targets
 clean:
-	-$(RM) UART_Communication.elf UART_Communication.list UART_Communication.map default.size.stdout
+	-$(RM) UART_Transmitter.elf UART_Transmitter.list UART_Transmitter.map default.size.stdout
 	-@echo ' '
 
 secondary-outputs: $(SIZE_OUTPUT) $(OBJDUMP_LIST)

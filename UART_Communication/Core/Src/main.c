@@ -18,7 +18,7 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
-
+#include <stdio.h>
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 
@@ -62,6 +62,48 @@ int __io_putchar(int ch)
 (void) HAL_UART_Transmit(&huart2, (uint8_t *) &ch, 1, 0xFFFFU);
  return ch;
 }
+
+void sendMsg(GPIO_TypeDef* gpioTypeTransmit, int transmitPin, int16_t message, int baudDelay, int bufferDelay){
+	// start bit
+	HAL_GPIO_WritePin(gpioTypeTransmit, transmitPin, 0);
+	HAL_Delay(baudDelay);
+
+	// send message
+	for (int i=0; i<16; i++){
+		HAL_GPIO_WritePin(gpioTypeTransmit, transmitPin, !!(message & (1 << 15-i)) );
+		HAL_Delay(baudDelay);
+	}
+
+	// go back to default high
+	HAL_GPIO_WritePin(gpioTypeTransmit, transmitPin, 1);
+	HAL_Delay(bufferDelay);
+}
+
+
+int16_t readMsg(GPIO_TypeDef* gpioTypeRead, int readPin, int baudDelay){
+	int16_t got_msg = 0;
+	printf("waiting for start bit\r\n");
+	while(HAL_GPIO_ReadPin(gpioTypeRead, readPin)){
+		//wait for start bit
+	}
+
+	printf("received start bit\r\n");
+	HAL_Delay(baudDelay+10); // let start bit end, delay a bit
+	for (int i=0; i<16; i++){
+		got_msg |= HAL_GPIO_ReadPin(gpioTypeRead, readPin) << 15-i;
+//		if (HAL_GPIO_ReadPin(gpioTypeRead, readPin)){
+//			printf("1");
+//		}
+//		else{
+//			printf("0");
+//		}
+//		printf("\r\n");
+	    HAL_Delay(baudDelay);
+	}
+
+	return got_msg;
+}
+
 /* USER CODE END 0 */
 
 /**
@@ -95,26 +137,16 @@ int main(void)
   MX_GPIO_Init();
   MX_USART2_UART_Init();
   /* USER CODE BEGIN 2 */
-  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_7, 1); // D11
+
+
   /* USER CODE END 2 */
-  int8_t message = 0b10110111;
-  int baudDelay = 200;
-  int bufferDelay = 1000;
+
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
   {
     /* USER CODE END WHILE */
-	  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_7, 0);
-	  HAL_Delay(baudDelay);
-
-	  for (int i=0; i<8; i++){
-		  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_7, !!(message & (1 << 7-i)) );
-		  HAL_Delay(baudDelay);
-	  }
-
-	  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_7, 1);
-	  HAL_Delay(bufferDelay);
+	  printf("%u\r\n", readMsg(GPIOA, GPIO_PIN_6, 100) );
     /* USER CODE BEGIN 3 */
   }
   /* USER CODE END 3 */
@@ -235,7 +267,7 @@ static void MX_GPIO_Init(void)
   /*Configure GPIO pin : PA6 */
   GPIO_InitStruct.Pin = GPIO_PIN_6;
   GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Pull = GPIO_PULLDOWN;
   HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
 /* USER CODE BEGIN MX_GPIO_Init_2 */
