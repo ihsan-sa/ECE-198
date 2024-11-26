@@ -29,18 +29,18 @@ LCD_E          (PB10)
 
 
   void reset_lcd_bits(){
-  	HAL_GPIO_WritePin(GPIOB, LCD_D0_Pin, 0);
-  	HAL_GPIO_WritePin(GPIOB, LCD_D1_Pin, 0);
-  	HAL_GPIO_WritePin(GPIOC, LCD_D2_Pin, 0);
-  	HAL_GPIO_WritePin(GPIOC, LCD_D3_Pin, 0);
-  	HAL_GPIO_WritePin(GPIOB, LCD_D4_Pin, 0);
-  	HAL_GPIO_WritePin(GPIOA, LCD_D5_Pin, 0);
-  	HAL_GPIO_WritePin(GPIOA, LCD_D6_Pin, 0);
-  	HAL_GPIO_WritePin(GPIOA, LCD_D7_Pin, 0);
-  	HAL_GPIO_WritePin(GPIOA, LCD_RW_Pin, 0);
-  	HAL_GPIO_WritePin(GPIOA, LCD_RS_Pin, 0);
+  	HAL_GPIO_WritePin(GPIOB, LCD_D0_Pin, GPIO_PIN_RESET);
+  	HAL_GPIO_WritePin(GPIOB, LCD_D1_Pin, GPIO_PIN_RESET);
+  	HAL_GPIO_WritePin(GPIOC, LCD_D2_Pin, GPIO_PIN_RESET);
+  	HAL_GPIO_WritePin(GPIOC, LCD_D3_Pin, GPIO_PIN_RESET);
+  	HAL_GPIO_WritePin(GPIOB, LCD_D4_Pin, GPIO_PIN_RESET);
+  	HAL_GPIO_WritePin(GPIOA, LCD_D5_Pin, GPIO_PIN_RESET);
+  	HAL_GPIO_WritePin(GPIOA, LCD_D6_Pin, GPIO_PIN_RESET);
+  	HAL_GPIO_WritePin(GPIOA, LCD_D7_Pin, GPIO_PIN_RESET);
+  	HAL_GPIO_WritePin(GPIOA, LCD_RW_Pin, GPIO_PIN_RESET);
+  	HAL_GPIO_WritePin(GPIOA, LCD_RS_Pin, GPIO_PIN_RESET);
   	//Enable pin
-  	HAL_GPIO_WritePin(GPIOB, LCD_E_Pin, 0);
+  	HAL_GPIO_WritePin(GPIOB, LCD_E_Pin, GPIO_PIN_RESET);
 
   }
   void send_lcd_instruction(int instruction, int rw, int rs){
@@ -62,34 +62,34 @@ LCD_E          (PB10)
 
   		switch (result){
   		case 0b00000001:
-  			HAL_GPIO_WritePin(GPIOB, LCD_D0_Pin, 1); break;
+  			HAL_GPIO_WritePin(GPIOB, LCD_D0_Pin, GPIO_PIN_SET); break;
   		case 0b00000010:
-  			HAL_GPIO_WritePin(GPIOB, LCD_D1_Pin, 1); break;
+  			HAL_GPIO_WritePin(GPIOB, LCD_D1_Pin, GPIO_PIN_SET); break;
   		case 0b00000100:
-  			HAL_GPIO_WritePin(GPIOC, LCD_D2_Pin, 1); break;
+  			HAL_GPIO_WritePin(GPIOC, LCD_D2_Pin, GPIO_PIN_SET); break;
   		case 0b00001000:
-  			HAL_GPIO_WritePin(GPIOC, LCD_D3_Pin, 1); break;
+  			HAL_GPIO_WritePin(GPIOC, LCD_D3_Pin, GPIO_PIN_SET); break;
   		case 0b00010000:
-  			HAL_GPIO_WritePin(GPIOB, LCD_D4_Pin, 1); break;
+  			HAL_GPIO_WritePin(GPIOB, LCD_D4_Pin, GPIO_PIN_SET); break;
   		case 0b00100000:
-  			HAL_GPIO_WritePin(GPIOA, LCD_D5_Pin, 1); break;
+  			HAL_GPIO_WritePin(GPIOA, LCD_D5_Pin, GPIO_PIN_SET); break;
   		case 0b01000000:
-  			HAL_GPIO_WritePin(GPIOA, LCD_D6_Pin, 1); break;
+  			HAL_GPIO_WritePin(GPIOA, LCD_D6_Pin, GPIO_PIN_SET); break;
   		case 0b10000000:
-  			HAL_GPIO_WritePin(GPIOA, LCD_D7_Pin, 1); break;
+  			HAL_GPIO_WritePin(GPIOA, LCD_D7_Pin, GPIO_PIN_SET); break;
   		}
 
   	}
   	for(int i = 0; i<8;i++) printf("%d", parsed_instruction[7-i]);
 
   	if(rw == 1)	{
-  		HAL_GPIO_WritePin(GPIOA, LCD_RW_Pin, 1);
+  		HAL_GPIO_WritePin(GPIOA, LCD_RW_Pin, GPIO_PIN_SET);
   		printf("  R/W: 1  ");
   	}else{
   		printf("  R/W: 0  ");
   	}
   	if(rs == 1) {
-  		HAL_GPIO_WritePin(GPIOA, LCD_RS_Pin, 1);
+  		HAL_GPIO_WritePin(GPIOA, LCD_RS_Pin, GPIO_PIN_SET);
   		printf("RS: 1");
   	}else{
   		printf("RS: 0");
@@ -98,9 +98,9 @@ LCD_E          (PB10)
 
   //	toggle enable_bit
 
-  	HAL_GPIO_WritePin(GPIOB, LCD_E_Pin, 1);
+  	HAL_GPIO_WritePin(GPIOB, LCD_E_Pin, GPIO_PIN_SET);
   	HAL_Delay(10);
-  	HAL_GPIO_WritePin(GPIOB, LCD_E_Pin, 0);
+  	HAL_GPIO_WritePin(GPIOB, LCD_E_Pin, GPIO_PIN_RESET);
 
   // set everything to zero again
   	reset_lcd_bits();

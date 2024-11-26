@@ -75,6 +75,8 @@ void Error_Handler(void);
 #define LCD_D5_GPIO_Port GPIOA
 #define LD2_Pin GPIO_PIN_5
 #define LD2_GPIO_Port GPIOA
+#define UART_RX_Pin GPIO_PIN_7
+#define UART_RX_GPIO_Port GPIOA
 #define LCD_D4_Pin GPIO_PIN_0
 #define LCD_D4_GPIO_Port GPIOB
 #define LCD_E_Pin GPIO_PIN_10
@@ -93,6 +95,8 @@ void Error_Handler(void);
 #define LCD_D0_GPIO_Port GPIOB
 #define LCD_D1_Pin GPIO_PIN_5
 #define LCD_D1_GPIO_Port GPIOB
+#define UART_TX_Pin GPIO_PIN_6
+#define UART_TX_GPIO_Port GPIOB
 
 /* USER CODE BEGIN Private defines */
 

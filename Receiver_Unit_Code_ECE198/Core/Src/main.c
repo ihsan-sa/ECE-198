@@ -22,7 +22,9 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "lcd.h"
+#include "uart.h"
 #include "stdio.h"
+
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -57,13 +59,10 @@ static void MX_USART2_UART_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-
-//allows use of printf()
 int _write(int file, char *data, int len){
 	HAL_UART_Transmit(&huart2, (uint8_t*)data, len, HAL_MAX_DELAY);
 	return len;
 }
-
 /* USER CODE END 0 */
 
 /**
@@ -97,18 +96,28 @@ int main(void)
   MX_GPIO_Init();
   MX_USART2_UART_Init();
   /* USER CODE BEGIN 2 */
+	lcd_init();
+	lcd_print_chars("INIT DONE", 0);
+//	HAL_GPIO_WritePin(GPIOA, UART_TX_Pin, GPIO_PIN_SET);
+//	HAL_Delay(1000);
+//	HAL_GPIO_WritePin(GPIOA, UART_TX_Pin, GPIO_PIN_RESET);
+	lcd_clear();
+	lcd_print_chars("ready", 0);
 
-
-  lcd_init();
-  lcd_print_chars("INIT DONE", 0);
-
+	char message[256];
+	read_message(message);
+	lcd_clear();
+	lcd_print_chars(message, 0);
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-
+//	  HAL_GPIO_WritePin(GPIOA, UART_TX_Pin, GPIO_PIN_SET);
+//	  HAL_Delay(1000);
+//	  HAL_GPIO_WritePin(GPIOA, UART_TX_Pin, GPIO_PIN_RESET);
+//	  HAL_Delay(0);100
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
@@ -220,7 +229,8 @@ static void MX_GPIO_Init(void)
                           |LCD_RW_Pin|LCD_RS_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOB, LCD_D4_Pin|LCD_E_Pin|LCD_D0_Pin|LCD_D1_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOB, LCD_D4_Pin|LCD_E_Pin|LCD_D0_Pin|LCD_D1_Pin
+                          |UART_TX_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin : B1_Pin */
   GPIO_InitStruct.Pin = B1_Pin;
@@ -244,8 +254,16 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
-  /*Configure GPIO pins : LCD_D4_Pin LCD_E_Pin LCD_D0_Pin LCD_D1_Pin */
-  GPIO_InitStruct.Pin = LCD_D4_Pin|LCD_E_Pin|LCD_D0_Pin|LCD_D1_Pin;
+  /*Configure GPIO pin : UART_RX_Pin */
+  GPIO_InitStruct.Pin = UART_RX_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  HAL_GPIO_Init(UART_RX_GPIO_Port, &GPIO_InitStruct);
+
+  /*Configure GPIO pins : LCD_D4_Pin LCD_E_Pin LCD_D0_Pin LCD_D1_Pin
+                           UART_TX_Pin */
+  GPIO_InitStruct.Pin = LCD_D4_Pin|LCD_E_Pin|LCD_D0_Pin|LCD_D1_Pin
+                          |UART_TX_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
