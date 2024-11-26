@@ -63,6 +63,9 @@ int __io_putchar(int ch)
  return ch;
 }
 
+// rn i have GPIO_PIN_7 to be send value
+// rn i have GPIO_PIN_6 to be read value
+
 void sendMsg(GPIO_TypeDef* gpioTypeTransmit, int transmitPin, int8_t message, int baudDelay, int bufferDelay){
 	// start bit
 	HAL_GPIO_WritePin(gpioTypeTransmit, transmitPin, 0);
@@ -88,8 +91,8 @@ void sendMsg(GPIO_TypeDef* gpioTypeTransmit, int transmitPin, int8_t message, in
 }
 
 
-int8_t readMsg(GPIO_TypeDef* gpioTypeRead, int readPin, int baudDelay){
-	int8_t got_msg = 0;
+uint8_t readMsg(GPIO_TypeDef* gpioTypeRead, int readPin, int baudDelay){
+	uint8_t got_msg = 0;
 	printf("waiting for start bit\r\n");
 	while(HAL_GPIO_ReadPin(gpioTypeRead, readPin)){
 		//wait for start bit
@@ -145,8 +148,8 @@ int main(void)
   MX_GPIO_Init();
   MX_USART2_UART_Init();
   /* USER CODE BEGIN 2 */
-  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_7, 1);
-
+  //HAL_GPIO_WritePin(GPIOA, GPIO_PIN_7, 1);
+  uint8_t readVal = 0;
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -154,8 +157,9 @@ int main(void)
   while (1)
   {
     /* USER CODE END WHILE */
-	  sendMsg(GPIOA, GPIO_PIN_7, 0b10100010, 100, 500);
-	  //printf("%u\r\n", readMsg(GPIOA, GPIO_PIN_6, 100) );
+	  readVal = readMsg(GPIOA, GPIO_PIN_6, 100);
+//	  sendMsg(GPIOA, GPIO_PIN_7, 0b10100010, 100, 500);
+	  printf("%d\r\n", readVal);
     /* USER CODE BEGIN 3 */
   }
   /* USER CODE END 3 */
