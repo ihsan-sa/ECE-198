@@ -84,8 +84,8 @@ all: main-build
 main-build: Measuring_Unit_ECE198.elf secondary-outputs
 
 # Tool invocations
-Measuring_Unit_ECE198.elf Measuring_Unit_ECE198.map: $(OBJS) $(USER_OBJS) C:\Users\ihsan\Documents\ECE-198\Measuring_Unit_ECE198\STM32F401RETX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
-	arm-none-eabi-g++ -o "Measuring_Unit_ECE198.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"C:\Users\ihsan\Documents\ECE-198\Measuring_Unit_ECE198\STM32F401RETX_FLASH.ld" --specs=nosys.specs -Wl,-Map="Measuring_Unit_ECE198.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -lstdc++ -lsupc++ -Wl,--end-group
+Measuring_Unit_ECE198.elf Measuring_Unit_ECE198.map: $(OBJS) $(USER_OBJS) C:\Users\ihsan\Downloads\ECE-198\Measuring_Unit_ECE198\STM32F401RETX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
+	arm-none-eabi-g++ -o "Measuring_Unit_ECE198.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"C:\Users\ihsan\Downloads\ECE-198\Measuring_Unit_ECE198\STM32F401RETX_FLASH.ld" --specs=nosys.specs -Wl,-Map="Measuring_Unit_ECE198.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -lstdc++ -lsupc++ -Wl,--end-group
 	@echo 'Finished building target: $@'
 	@echo ' '
 

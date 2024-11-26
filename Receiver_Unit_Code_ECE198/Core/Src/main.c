@@ -22,7 +22,7 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "lcd.h"
-#include "uart.h"
+#include "uart_sigma.h"
 #include "stdio.h"
 
 /* USER CODE END Includes */
@@ -103,11 +103,18 @@ int main(void)
 //	HAL_GPIO_WritePin(GPIOA, UART_TX_Pin, GPIO_PIN_RESET);
 	lcd_clear();
 	lcd_print_chars("ready", 0);
+	printf("Ready\n\r");
+	HAL_Delay(10000);
+	printf("Ready\n\r");
 
-	char message[256];
-	read_message(message);
-	lcd_clear();
-	lcd_print_chars(message, 0);
+	UART_init();
+
+	int received = UART_read_byte();
+
+	printf("%d\n\r", received);
+
+//	lcd_clear();
+//	lcd_print_chars("done", 0);
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -118,6 +125,10 @@ int main(void)
 //	  HAL_Delay(1000);
 //	  HAL_GPIO_WritePin(GPIOA, UART_TX_Pin, GPIO_PIN_RESET);
 //	  HAL_Delay(0);100
+
+//	  int received = UART_read_byte();
+	  printf("\n\r%d\n\r", UART_read_byte());
+	  HAL_Delay(30);
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */

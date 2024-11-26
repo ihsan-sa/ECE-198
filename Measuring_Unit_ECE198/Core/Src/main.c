@@ -24,6 +24,7 @@
 //#include "uart.hpp"
 #include "stdio.h"
 #include "uart.h"
+#include "uart_sigma.h"
 //#include "cpp_main.cpp"
 //extern int cpp_main(void);
 /* USER CODE END Includes */
@@ -98,9 +99,9 @@ int main(void)
   MX_USART2_UART_Init();
   /* USER CODE BEGIN 2 */
 
-	char message[10] = {'H', 'e','l','l','o','\0'};
-	send_message(message);
-	printf("Message sent\n\r");
+	UART_init();
+	UART_send_byte(0b11111111);
+
 
   /* USER CODE END 2 */
 
