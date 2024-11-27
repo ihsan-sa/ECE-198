@@ -892,9 +892,9 @@ uint8_t readMsg(GPIO_TypeDef* gpioTypeRead, int readPin, int baudDelay){
 	printf("received start bit\r\n");
  80008fa:	4817      	ldr	r0, [pc, #92]	@ (8000958 <readMsg+0x88>)
  80008fc:	f002 f87e 	bl	80029fc <puts>
-	HAL_Delay(baudDelay+15); // let start bit end, delay a bit
+	HAL_Delay(baudDelay+10); // let start bit end, delay a bit
  8000900:	687b      	ldr	r3, [r7, #4]
- 8000902:	330f      	adds	r3, #15
+ 8000902:	330a      	adds	r3, #10
  8000904:	4618      	mov	r0, r3
  8000906:	f000 fbeb 	bl	80010e0 <HAL_Delay>
 	for (int i=0; i<8; i++){
@@ -1045,8 +1045,8 @@ int main(void)
 
 //	  int received = UART_read_byte();
 //	  printf("RX Pin: %d \n\r", HAL_GPIO_ReadPin(GPIOA, UART_RX_Pin));
-	  int data = readMsg(GPIOA, UART_RX_Pin, 30);
- 80009e2:	221e      	movs	r2, #30
+	  int data = readMsg(GPIOA, UART_RX_Pin, 20);
+ 80009e2:	2214      	movs	r2, #20
  80009e4:	2180      	movs	r1, #128	@ 0x80
  80009e6:	4830      	ldr	r0, [pc, #192]	@ (8000aa8 <main+0x120>)
  80009e8:	f7ff ff72 	bl	80008d0 <readMsg>

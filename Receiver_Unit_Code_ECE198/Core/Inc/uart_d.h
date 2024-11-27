@@ -49,7 +49,7 @@ uint8_t readMsg(GPIO_TypeDef* gpioTypeRead, int readPin, int baudDelay){
 	}
 
 	printf("received start bit\r\n");
-	HAL_Delay(baudDelay+15); // let start bit end, delay a bit
+	HAL_Delay(baudDelay+10); // let start bit end, delay a bit
 	for (int i=0; i<8; i++){
 		got_msg |= HAL_GPIO_ReadPin(gpioTypeRead, readPin) << (7-i);
 //		if (HAL_GPIO_ReadPin(gpioTypeRead, readPin)){
