@@ -126,7 +126,7 @@ int main(void)
 
 //	  int received = UART_read_byte();
 //	  printf("RX Pin: %d \n\r", HAL_GPIO_ReadPin(GPIOA, UART_RX_Pin));
-	  int data = readMsg(GPIOA, UART_RX_Pin, 4);
+	  int data = readMsg(GPIOA, UART_RX_Pin, 30);
 	  printf("Received: %d\n\r", data);
 	  char send[10];
 
