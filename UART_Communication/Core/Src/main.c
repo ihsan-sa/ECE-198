@@ -105,9 +105,9 @@ int main(void)
   while (1)
   {
     /* USER CODE END WHILE */
-	  readVal = readMsg(GPIOA, GPIO_PIN_6, 100);
-//	  sendMsg(GPIOA, GPIO_PIN_7, 0b10100010, 100, 500);
-	  printf("%d\r\n", readVal);
+//	  readVal = readMsg(GPIOA, GPIO_PIN_6, 100);
+	  sendMsg(GPIOA, GPIO_PIN_7, 0b10100010, 100, 500);
+//	  printf("%d\r\n", readVal);
     /* USER CODE BEGIN 3 */
   }
   /* USER CODE END 3 */
