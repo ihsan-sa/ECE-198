@@ -16,19 +16,23 @@ void setup() {
 
 void loop() {
   // put your main code here, to run repeatedly:
+
+//recieve
 //  message = 0;
 //  Serial.println("waiting for start bit");
 //  while(digitalRead(recievePin)){
 //  }
 //
 //  Serial.println("recieved start bit");
-//  delay(baudDelay+5); // let start bit end, delay a bit
+//  delay(baudDelay+10); // let start bit end, delay a bit
 //  for (int i=0; i<16; i++){
 //    message |= digitalRead(recievePin) << 15-i;
 //    delay(baudDelay);
 //  }
 //
 //  Serial.println(message, BIN);
+
+// send
   digitalWrite(transmitPin, 1);
   delay(bufferDelay);
   digitalWrite(transmitPin, 0);
