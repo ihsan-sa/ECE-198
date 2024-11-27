@@ -22,7 +22,7 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "lcd.h"
-#include "uart_sigma.h"
+#include "uart_d.h"
 #include "stdio.h"
 
 /* USER CODE END Includes */
@@ -104,14 +104,9 @@ int main(void)
 	lcd_clear();
 	lcd_print_chars("ready", 0);
 	printf("Ready\n\r");
-	HAL_Delay(10000);
-	printf("Ready\n\r");
 
-	UART_init();
 
-	int received = UART_read_byte();
 
-	printf("%d\n\r", received);
 
 //	lcd_clear();
 //	lcd_print_chars("done", 0);
@@ -127,8 +122,16 @@ int main(void)
 //	  HAL_Delay(0);100
 
 //	  int received = UART_read_byte();
-	  printf("\n\r%d\n\r", UART_read_byte());
-	  HAL_Delay(30);
+//	  printf("RX Pin: %d \n\r", HAL_GPIO_ReadPin(GPIOA, UART_RX_Pin));
+	  int data = readMsg(GPIOA, UART_RX_Pin, 15);
+	  printf("Received: %d\n\r", data);
+	  char send[10];
+
+	  sprintf(send, "%d", data);
+	  lcd_clear();
+	  lcd_print_chars(send,0);
+
+
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
