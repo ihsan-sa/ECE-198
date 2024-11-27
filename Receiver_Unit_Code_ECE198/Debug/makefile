@@ -84,8 +84,8 @@ all: main-build
 main-build: Receiver_Unit_Code_ECE198.elf secondary-outputs
 
 # Tool invocations
-Receiver_Unit_Code_ECE198.elf Receiver_Unit_Code_ECE198.map: $(OBJS) $(USER_OBJS) C:\Users\ihsan\Downloads\ECE-198\Receiver_Unit_Code_ECE198\STM32F401RETX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
-	arm-none-eabi-g++ -o "Receiver_Unit_Code_ECE198.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"C:\Users\ihsan\Downloads\ECE-198\Receiver_Unit_Code_ECE198\STM32F401RETX_FLASH.ld" --specs=nosys.specs -Wl,-Map="Receiver_Unit_Code_ECE198.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -lstdc++ -lsupc++ -Wl,--end-group
+Receiver_Unit_Code_ECE198.elf Receiver_Unit_Code_ECE198.map: $(OBJS) $(USER_OBJS) C:\Users\ihsan\Downloads\new_ece_198\ECE-198\Receiver_Unit_Code_ECE198\STM32F401RETX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
+	arm-none-eabi-g++ -o "Receiver_Unit_Code_ECE198.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"C:\Users\ihsan\Downloads\new_ece_198\ECE-198\Receiver_Unit_Code_ECE198\STM32F401RETX_FLASH.ld" --specs=nosys.specs -Wl,-Map="Receiver_Unit_Code_ECE198.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -lstdc++ -lsupc++ -Wl,--end-group
 	@echo 'Finished building target: $@'
 	@echo ' '
 
