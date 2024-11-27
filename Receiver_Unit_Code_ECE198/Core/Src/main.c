@@ -130,8 +130,7 @@ int main(void)
 	  printf("Received: %d\n\r", data);
 	  char send[10];
 
-	  lcd_clear();
-	  lcd_print_chars(send,0);
+
 
 //	  velocity = velocity + (dt*(data));
 //	  position = position + (dt*velocity);

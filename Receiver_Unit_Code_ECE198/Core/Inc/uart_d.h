@@ -41,8 +41,8 @@ void sendMsg(GPIO_TypeDef* gpioTypeTransmit, int transmitPin, int8_t message, in
 }
 
 
-uint8_t readMsg(GPIO_TypeDef* gpioTypeRead, int readPin, int baudDelay){
-	uint8_t got_msg = 0;
+int8_t readMsg(GPIO_TypeDef* gpioTypeRead, int readPin, int baudDelay){
+	int8_t got_msg = 0;
 	printf("waiting for qstart bit\r\n");
 	while(HAL_GPIO_ReadPin(gpioTypeRead, readPin)){
 		//wait for start bit
