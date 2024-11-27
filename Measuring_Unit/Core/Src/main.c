@@ -18,12 +18,15 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
-#include <stdio.h>
-#include "mpuDataCollection.h"
-#include "uartCommunication.h"
+#include "cmsis_os.h"
+
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#include "mpuDataCollection.h"
+#include "uartCommunication.h"
+#include <stdio.h>
+#include "queue.h"
+#include "FreeRTOS.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -44,6 +47,25 @@
 /* Private variables ---------------------------------------------------------*/
 UART_HandleTypeDef huart2;
 
+/* Definitions for read_accl */
+osThreadId_t read_acclHandle;
+const osThreadAttr_t read_accl_attributes = {
+  .name = "read_accl",
+  .stack_size = 128 * 4,
+  .priority = (osPriority_t) osPriorityNormal,
+};
+/* Definitions for send_data */
+osThreadId_t send_dataHandle;
+const osThreadAttr_t send_data_attributes = {
+  .name = "send_data",
+  .stack_size = 128 * 4,
+  .priority = (osPriority_t) osPriorityBelowNormal,
+};
+/* Definitions for accel_data */
+osMessageQueueId_t accel_dataHandle;
+const osMessageQueueAttr_t accel_data_attributes = {
+  .name = "accel_data"
+};
 /* USER CODE BEGIN PV */
 
 /* USER CODE END PV */
@@ -52,6 +74,9 @@ UART_HandleTypeDef huart2;
 void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
 static void MX_USART2_UART_Init(void);
+void read_accl_function(void *argument);
+void send_data_function(void *argument);
+
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
@@ -66,6 +91,7 @@ int __io_putchar(int ch)
  return ch;
 }
 
+QueueHandle_t accel_dataQueue;
 /* USER CODE END 0 */
 
 /**
@@ -98,7 +124,6 @@ int main(void)
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   MX_USART2_UART_Init();
-
   /* USER CODE BEGIN 2 */
   int mpuDeviceAddress = 0x68; // first 7 bits of i2c data
   int acclZAxisRegisterBits15_8 = 0x3F; // 0x3f, 0x40
@@ -124,34 +149,63 @@ int main(void)
 
   // uint8_t readVal = 0;
 
-
-
   // wake up MPU
   writeMPU(sdaType, sda, sclType, scl, readType, read, mpuDeviceAddress, powerRegister, 0, delayTime);
 
+
+  accel_dataQueue = xQueueCreate(5, sizeof(int));
+
   /* USER CODE END 2 */
+
+  /* Init scheduler */
+  osKernelInitialize();
+
+  /* USER CODE BEGIN RTOS_MUTEX */
+  /* add mutexes, ... */
+  /* USER CODE END RTOS_MUTEX */
+
+  /* USER CODE BEGIN RTOS_SEMAPHORES */
+  /* add semaphores, ... */
+  /* USER CODE END RTOS_SEMAPHORES */
+
+  /* USER CODE BEGIN RTOS_TIMERS */
+  /* start timers, add new ones, ... */
+  /* USER CODE END RTOS_TIMERS */
+
+  /* Create the queue(s) */
+  /* creation of accel_data */
+  accel_dataHandle = osMessageQueueNew (16, sizeof(uint16_t), &accel_data_attributes);
+
+  /* USER CODE BEGIN RTOS_QUEUES */
+  /* add queues, ... */
+  /* USER CODE END RTOS_QUEUES */
+
+  /* Create the thread(s) */
+  /* creation of read_accl */
+  read_acclHandle = osThreadNew(read_accl_function, NULL, &read_accl_attributes);
+
+  /* creation of send_data */
+  send_dataHandle = osThreadNew(send_data_function, NULL, &send_data_attributes);
+
+  /* USER CODE BEGIN RTOS_THREADS */
+  /* add threads, ... */
+  /* USER CODE END RTOS_THREADS */
+
+  /* USER CODE BEGIN RTOS_EVENTS */
+  /* add events, ... */
+  /* USER CODE END RTOS_EVENTS */
+
+  /* Start scheduler */
+  osKernelStart();
+
+  /* We should never get here as control is now taken by the scheduler */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
   {
     /* USER CODE END WHILE */
-	  acclZ = 0;
-	  acclZ |= ((readMPU(sdaType, sda, sclType, scl, readType, read, mpuDeviceAddress, acclZAxisRegisterBits15_8, delayTime)) << 8);
-	  acclZ |= readMPU(sdaType, sda, sclType, scl, readType, read, mpuDeviceAddress, acclZAxisRegisterBits7_0, delayTime);
-	  acclMS2 = (float)(acclZ) / 16000.0 * 9.8;
 
-	  printf("\n");
-	  printf("%d\r\n", acclZ);
-
-	  printf("\n");
-	  printf("%d", (int) acclMS2);
-	  printf(".");
-	  printf("%d\r\n", ( (int)(acclMS2 * 10.0) ) % 10);
-
-	  printf("\n");
-
-	  sendMsg(txType, UART_TX_Pin, (int) acclMS2, 15, 10);
     /* USER CODE BEGIN 3 */
   }
   /* USER CODE END 3 */
@@ -295,6 +349,109 @@ static void MX_GPIO_Init(void)
 /* USER CODE BEGIN 4 */
 
 /* USER CODE END 4 */
+
+/* USER CODE BEGIN Header_read_accl_function */
+/**
+  * @brief  Function implementing the read_accl thread.
+  * @param  argument: Not used
+  * @retval None
+  */
+/* USER CODE END Header_read_accl_function */
+void read_accl_function(void *argument)
+{
+  /* USER CODE BEGIN 5 */
+
+  /* Infinite loop */
+  for(;;)
+  {
+
+	  int mpuDeviceAddress = 0x68; // first 7 bits of i2c data
+	    int acclZAxisRegisterBits15_8 = 0x3F; // 0x3f, 0x40
+	    int acclZAxisRegisterBits7_0 = 0x40;
+	    int powerRegister = 0x6B;
+
+	    int sda = GPIO_PIN_8; // D7 --> PA_8
+	    #define sdaType GPIOA
+
+	    int scl = GPIO_PIN_9; //D8 --> PA_9
+	    #define sclType GPIOA
+
+	    int read = GPIO_PIN_5; //D4 --> PB_5
+	    #define readType GPIOB
+
+	    int delayTime = 1; // 1 ms
+
+	    int16_t acclZ = 0;
+	    float acclMS2 = 0;
+	    int sendAccl=0;
+	    int UART_TX_Pin = GPIO_PIN_7;
+	    	  #define txType GPIOA
+	  acclZ |= ((readMPU(sdaType, sda, sclType, scl, readType, read, mpuDeviceAddress, acclZAxisRegisterBits15_8, delayTime)) << 8);
+	  acclZ |= readMPU(sdaType, sda, sclType, scl, readType, read, mpuDeviceAddress, acclZAxisRegisterBits7_0, delayTime);
+	  acclMS2 = (float)(acclZ) / 16000.0 * 9.8;
+
+	  printf("\n");
+	  printf("%d\r\n", acclZ);
+
+	  printf("\n");
+	  printf("%d", (int) acclMS2);
+	  printf(".");
+	  printf("%d\r\n", ( (int)(acclMS2 * 10.0) ) % 10);
+
+	  printf("\n");
+	  sendAccl = (int) (10*acclMS2);
+
+	  sendMsg(txType, UART_TX_Pin, sendAccl, 15, 10);
+
+    osDelay(1);
+  }
+  /* USER CODE END 5 */
+}
+
+/* USER CODE BEGIN Header_send_data_function */
+/**
+* @brief Function implementing the send_data thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_send_data_function */
+void send_data_function(void *argument)
+{
+  /* USER CODE BEGIN send_data_function */
+	int receiveData=0;
+  /* Infinite loop */
+  for(;;)
+  {
+	  int UART_TX_Pin = GPIO_PIN_7;
+	  #define txType GPIOA
+
+//		  sendMsg(txType, UART_TX_Pin, receiveData, 15, 10);
+
+    osDelay(1);
+  }
+  /* USER CODE END send_data_function */
+}
+
+/**
+  * @brief  Period elapsed callback in non blocking mode
+  * @note   This function is called  when TIM5 interrupt took place, inside
+  * HAL_TIM_IRQHandler(). It makes a direct call to HAL_IncTick() to increment
+  * a global variable "uwTick" used as application time base.
+  * @param  htim : TIM handle
+  * @retval None
+  */
+void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
+{
+  /* USER CODE BEGIN Callback 0 */
+
+  /* USER CODE END Callback 0 */
+  if (htim->Instance == TIM5) {
+    HAL_IncTick();
+  }
+  /* USER CODE BEGIN Callback 1 */
+
+  /* USER CODE END Callback 1 */
+}
 
 /**
   * @brief  This function is executed in case of error occurrence.
