@@ -7,7 +7,7 @@
 ../Core/Inc/uart_d.h:44:9:readMsg	3
 ../Core/Src/main.c:62:5:_write	1
 ../Core/Src/main.c:72:5:main	1
-../Core/Src/main.c:146:6:SystemClock_Config	3
-../Core/Src/main.c:193:13:MX_USART2_UART_Init	2
-../Core/Src/main.c:226:13:MX_GPIO_Init	1
-../Core/Src/main.c:298:6:Error_Handler	1
+../Core/Src/main.c:154:6:SystemClock_Config	3
+../Core/Src/main.c:201:13:MX_USART2_UART_Init	2
+../Core/Src/main.c:234:13:MX_GPIO_Init	1
+../Core/Src/main.c:306:6:Error_Handler	1

@@ -105,6 +105,9 @@ int main(void)
 	lcd_print_chars("ready", 0);
 	printf("Ready\n\r");
 
+	 long long position = 0;
+   long long velocity = 0;
+	unsigned long long dt = 400;
 
 
 
@@ -127,7 +130,12 @@ int main(void)
 	  printf("Received: %d\n\r", data);
 	  char send[10];
 
-	  sprintf(send, "%d", data);
+	  lcd_clear();
+	  lcd_print_chars(send,0);
+
+	  velocity = velocity + (dt*(data));
+	  position = position + (dt*velocity);
+	  sprintf(send, "%d - %d", data, position);
 	  lcd_clear();
 	  lcd_print_chars(send,0);
 
