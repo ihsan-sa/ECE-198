@@ -126,16 +126,16 @@ int main(void)
 
 //	  int received = UART_read_byte();
 //	  printf("RX Pin: %d \n\r", HAL_GPIO_ReadPin(GPIOA, UART_RX_Pin));
-	  int data = readMsg(GPIOA, UART_RX_Pin, 20);
+	  int data = readMsg(GPIOA, UART_RX_Pin, 15);
 	  printf("Received: %d\n\r", data);
 	  char send[10];
 
 	  lcd_clear();
 	  lcd_print_chars(send,0);
 
-	  velocity = velocity + (dt*(data));
-	  position = position + (dt*velocity);
-	  sprintf(send, "%d - %d", data, position);
+//	  velocity = velocity + (dt*(data));
+//	  position = position + (dt*velocity);
+	  sprintf(send, "%d", data);
 	  lcd_clear();
 	  lcd_print_chars(send,0);
 
